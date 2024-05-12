@@ -25,6 +25,7 @@ jobs:
       
     - name: Test with Maven
       run: mvn -B test --file pom.xml
+      id: tests
       continue-on-error: true
       
     - name: Telegram Notify
