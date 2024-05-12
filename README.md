@@ -1,3 +1,5 @@
+# Статус тестов
+![example workflow](https://github.com/linagolubeva22/tp_Tz2/actions/workflows/main.yml/badge.svg)
 # Проект по обработке чисел из файла
 
 ## Описание
