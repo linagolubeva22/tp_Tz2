@@ -1,5 +1,9 @@
 # Статус тестов
 ![example workflow](https://github.com/linagolubeva22/tp_Tz2/actions/workflows/main.yml/badge.svg)
+
+# Ссылка на беседу в телеграм с ботом
+https://t.me/+LQIxzcCxWz5iNmU6
+
 # Проект по обработке чисел из файла
 
 ## Описание
