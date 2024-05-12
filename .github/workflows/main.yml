@@ -19,24 +19,32 @@ jobs:
         distribution: 'adopt'
         cache: maven
 
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
-      continue-on-error: true
-      
-    - name: Test with Maven
-      run: mvn -B test --file pom.xml
-      id: tests
-      continue-on-error: true
-      
-    - name: Telegram Notify
+    - name: Run Tests
+      run: mvn test -Dsurefire.reportFormat=xml -Dmaven.test.failure.ignore=true
+
+    - name: Check Test Results
+      id: check
+      run: |
+        if grep -q '<failure' **/target/surefire-reports/*.xml; then
+          echo "::set-output name=status::FAIL"
+          failures=$(grep -oPm1 "(?<=<failure.*>).*(?=</failure>)" **/target/surefire-reports/*.xml)
+          echo "::set-output name=details::${failures}"
+        else
+          echo "::set-output name=status::OK"
+        fi
+
+    - name: Telegram Notify on Test Success
+      if: steps.check.outputs.status == 'OK'
       uses: appleboy/telegram-action@master
       with:
         to: ${{ secrets.TELEGRAM_CHAT_ID }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        message: |
-            GitHub Actions Notification:
-            - Event: ${{ github.event_name }}
-            - Repository: ${{ github.repository }}
-            - Workflow: ${{ github.workflow }}
-            - Action Status: ${{ job.status }}
-            - Tests: ${{ steps.tests.outcome }}
+        message: "Всё ок!"
+
+    - name: Telegram Notify on Test Failure
+      if: steps.check.outputs.status == 'FAIL'
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: "Что-то упало: ${{ steps.check.outputs.details }}"
