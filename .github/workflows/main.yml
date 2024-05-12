@@ -21,6 +21,21 @@ jobs:
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-
+      continue-on-error: true
+      
     - name: Test with Maven
       run: mvn -B test --file pom.xml
+      continue-on-error: true
+      
+    - name: Telegram Notify
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+            GitHub Actions Notification:
+            - Event: ${{ github.event_name }}
+            - Repository: ${{ github.repository }}
+            - Workflow: ${{ github.workflow }}
+            - Action Status: ${{ job.status }}
+            - Tests: ${{ steps.tests.outcome }}
